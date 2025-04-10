@@ -276,19 +276,14 @@ TEST(NonParameterizedTests, eachRpcHasAUniqueId) {
 // @VsrTest = 3.10-015
 // @VsrTest = 3.10-018.001
 TEST(NonParameterizedTests, requireDiceOnDefaultInstanceIfProtectedVmSupported) {
-    int first_vendor_api_level = get_first_vendor_api_level();
-    if (first_vendor_api_level < 202504) {
-        GTEST_SKIP() << "Applies only to devices that shipped with vendor API level >= 202504, but "
-                     << "this device shipped with: " << first_vendor_api_level;
+    int vendor_api_level = get_vendor_api_level();
+    if (vendor_api_level < __ANDROID_API_V__) {
+        GTEST_SKIP() << "Applies only to vendor API level >= 202404, but this device is: "
+                     << vendor_api_level;
     }
 
     if (!::android::base::GetBoolProperty("ro.boot.hypervisor.protected_vm.supported", false)) {
         GTEST_SKIP() << "DICE is only required when protected VMs are supported";
-    }
-
-    // Skip on auto due to GAS requirement G-SH-917.
-    if (check_feature(FEATURE_AUTOMOTIVE)) {
-        GTEST_SKIP() << "This is an automotive device.";
     }
 
     auto rpc = getHandle<IRemotelyProvisionedComponent>(DEFAULT_INSTANCE_NAME);
